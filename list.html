@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Student Teacher Appointment System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- React and Babel CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function MainComponent() {
+  const [currentUser, setCurrentUser] = React.useState(null);
+  const [userType, setUserType] = React.useState("");
+  const [showModal, setShowModal] = React.useState(false);
+  const [modalType, setModalType] = React.useState("");
+  const [selectedDate, setSelectedDate] = React.useState("");
+  const [selectedTime, setSelectedTime] = React.useState("");
+  const [selectedTeacher, setSelectedTeacher] = React.useState(null);
+  const [appointments, setAppointments] = React.useState([]);
+  const [teachers, setTeachers] = React.useState([
+  { id: 1, name: "Dr. Meena Sharma", subject: "Mathematics", email: "meena.sharma@school.in" },
+  { id: 2, name: "Prof. Arvind Kumar", subject: "Physics", email: "arvind.kumar@school.in" },
+  { id: 3, name: "Ms. Neha Joshi", subject: "Chemistry", email: "neha.joshi@school.in" },
+  { id: 4, name: "Mr. Ramesh Verma", subject: "Biology", email: "ramesh.verma@school.in" },
+  { id: 5, name: "Dr. Anjali Iyer", subject: "Computer Science", email: "anjali.iyer@school.in" },
+  { id: 6, name: "Prof. Rajeev Menon", subject: "English", email: "rajeev.menon@school.in" },
+  { id: 7, name: "Ms. Swati Patel", subject: "History", email: "swati.patel@school.in" },
+  { id: 8, name: "Mr. Vikram Das", subject: "Geography", email: "vikram.das@school.in" },
+    { id: 9, name: "Dr. Priya Singh", subject: "Economics", email: "priya.singh@school.in" },
+
+]);
+
+  const [teacherAvailability, setTeacherAvailability] = React.useState({
+    1: {
+  "2025-07-04": ["11:00", "13:00", "14:00", "15:00", "16:00"],
+  "2025-07-05": ["10:00", "15:00", "16:00", "17:00"],
+    },
+    2:  {
+  "2025-07-04": ["11:00", "13:00", "14:00", "15:00", "16:00"],
+  "2025-07-05": ["10:00", "15:00", "16:00", "17:00"],
+    },
+    3: {
+  "2025-07-04": ["11:00", "13:00", "14:00", "15:00", "16:00"],
+  "2025-07-05": ["10:00", "15:00", "16:00", "17:00"],
+    },
+    4:  {
+  "2025-07-04": ["11:00", "13:00", "14:00", "15:00", "16:00"],
+  "2025-07-05": ["10:00", "15:00", "16:00", "17:00"],
+    },
+    5:  {
+  "2025-07-04": ["11:00", "13:00", "14:00", "15:00", "16:00"],
+  "2025-07-05": ["10:00", "15:00", "16:00", "17:00"],
+    },
+6:  {
+  "2025-07-04": ["11:00", "13:00", "14:00", "15:00", "16:00"],
+  "2025-07-05": ["10:00", "15:00", "16:00", "17:00"],
+    },
+7:  {
+  "2025-07-04": ["11:00", "13:00", "14:00", "15:00", "16:00"],
+  "2025-07-05": ["10:00", "15:00", "16:00", "17:00"],
+    },
+8:  {
+  "2025-07-04": ["11:00", "13:00", "14:00", "15:00", "16:00"],
+  "2025-07-05": ["10:00", "15:00", "16:00", "17:00"],
+    },
+9: {
+  "2025-07-04": ["11:00", "13:00", "14:00", "15:00", "16:00"],
+  "2025-07-05": ["10:00", "15:00", "16:00", "17:00"],
+    },
+
+  });
+  const [loginForm, setLoginForm] = React.useState({
+    email: "",
+    password: "",
+    type: "student",
+  });
+  const [registerForm, setRegisterForm] = React.useState({
+    name: "",
+    email: "",
+    password: "",
+    type: "student",
+  });
+
+  // Mock users for demo
+  const [users] = React.useState([
+    {
+      id: 1,
+      name: "John Student",
+      email: "student@school.edu",
+      password: "password",
+      type: "student",
+    },
+    {
+      id: 2,
+      name: "Dr. Smith",
+      email: "smith@school.edu",
+      password: "password",
+      type: "teacher",
+    },
+    {
+      id: 3,
+      name: "Prof. Johnson",
+      email: "johnson@school.edu",
+      password: "password",
+      type: "teacher",
+    },
+    {
+  id: 4,
+  name: "Guest User",
+  email: "guest@school.edu",
+  password: "guest",
+  type: "student",
+}
+
+  ]);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const user = users.find(
+      (u) =>
+        u.email === loginForm.email &&
+        u.password === loginForm.password &&
+        u.type === loginForm.type,
+    );
+    if (user) {
+      setCurrentUser(user);
+      setUserType(user.type);
+      setShowModal(false);
+      setLoginForm({ email: "", password: "", type: "student" });
+    } else {
+      alert("Invalid credentials");
+    }
+  };
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    const newUser = {
+      id: users.length + 1,
+      ...registerForm,
+    };
+    setCurrentUser(newUser);
+    setUserType(newUser.type);
+    setShowModal(false);
+    setRegisterForm({ name: "", email: "", password: "", type: "student" });
+  };
+  const handleGuestLogin = () => {
+  const guestUser = users.find((u) => u.email === "guest@school.edu");
+  if (guestUser) {
+    setCurrentUser(guestUser);
+    setUserType(guestUser.type);
+    setShowModal(false);
+  }
+};
+
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setUserType("");
+  };
+
+  const bookAppointment = () => {
+    if (!selectedDate || !selectedTime || !selectedTeacher) {
+      alert("Please select date, time, and teacher");
+      return;
+    }
+
+    const newAppointment = {
+      id: appointments.length + 1,
+      studentId: currentUser.id,
+      studentName: currentUser.name,
+      teacherId: selectedTeacher.id,
+      teacherName: selectedTeacher.name,
+      subject: selectedTeacher.subject,
+      date: selectedDate,
+      time: selectedTime,
+      status: "confirmed",
+    };
+
+    setAppointments([...appointments, newAppointment]);
+
+    // Remove booked slot from availability
+    const updatedAvailability = { ...teacherAvailability };
+    updatedAvailability[selectedTeacher.id][selectedDate] = updatedAvailability[
+      selectedTeacher.id
+    ][selectedDate].filter((time) => time !== selectedTime);
+    setTeacherAvailability(updatedAvailability);
+
+    setShowModal(false);
+    setSelectedDate("");
+    setSelectedTime("");
+    setSelectedTeacher(null);
+  };
+
+  const cancelAppointment = (appointmentId) => {
+    const appointment = appointments.find((apt) => apt.id === appointmentId);
+    if (appointment) {
+      // Add slot back to availability
+      const updatedAvailability = { ...teacherAvailability };
+      if (!updatedAvailability[appointment.teacherId][appointment.date]) {
+        updatedAvailability[appointment.teacherId][appointment.date] = [];
+      }
+      updatedAvailability[appointment.teacherId][appointment.date].push(
+        appointment.time,
+      );
+      updatedAvailability[appointment.teacherId][appointment.date].sort();
+      setTeacherAvailability(updatedAvailability);
+    }
+
+    setAppointments(appointments.filter((apt) => apt.id !== appointmentId));
+  };
+
+  const addAvailability = () => {
+    if (!selectedDate || !selectedTime) {
+      alert("Please select date and time");
+      return;
+    }
+
+    const updatedAvailability = { ...teacherAvailability };
+    const teacherId = currentUser.id;
+
+    if (!updatedAvailability[teacherId]) {
+      updatedAvailability[teacherId] = {};
+    }
+    if (!updatedAvailability[teacherId][selectedDate]) {
+      updatedAvailability[teacherId][selectedDate] = [];
+    }
+
+    if (!updatedAvailability[teacherId][selectedDate].includes(selectedTime)) {
+      updatedAvailability[teacherId][selectedDate].push(selectedTime);
+      updatedAvailability[teacherId][selectedDate].sort();
+      setTeacherAvailability(updatedAvailability);
+    }
+
+    setShowModal(false);
+    setSelectedDate("");
+    setSelectedTime("");
+  };
+
+  const removeAvailability = (date, time) => {
+    const updatedAvailability = { ...teacherAvailability };
+    const teacherId = currentUser.id;
+
+    if (
+      updatedAvailability[teacherId] &&
+      updatedAvailability[teacherId][date]
+    ) {
+      updatedAvailability[teacherId][date] = updatedAvailability[teacherId][
+        date
+      ].filter((t) => t !== time);
+      setTeacherAvailability(updatedAvailability);
+    }
+  };
+
+  const getAvailableDates = () => {
+    const dates = [];
+    const today = new Date();
+    for (let i = 0; i < 14; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      dates.push(date.toISOString().split("T")[0]);
+    }
+    return dates;
+  };
+
+  const getTimeSlots = () => {
+    const slots = [];
+    for (let hour = 9; hour <= 17; hour++) {
+      slots.push(`${hour.toString().padStart(2, "0")}:00`);
+    }
+    return slots;
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  if (!currentUser) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            background: "white",
+            borderRadius: "20px",
+            padding: "40px",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+            maxWidth: "400px",
+            width: "100%",
+          }}
+        >
+          <div style={{ textAlign: "center", marginBottom: "30px" }}>
+            <h1
+              style={{
+                fontSize: "28px",
+                fontWeight: "bold",
+                color: "#333",
+                marginBottom: "10px",
+              }}
+            >
+              📚 EduBook
+            </h1>
+            <p style={{ color: "#666", fontSize: "16px" }}>
+              Student-Teacher Appointment System
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              marginBottom: "20px",
+              background: "#f8f9fa",
+              borderRadius: "10px",
+              padding: "4px",
+            }}
+          >
+            <button
+              onClick={() => setModalType("login")}
+              style={{
+                flex: 1,
+                padding: "12px",
+                border: "none",
+                borderRadius: "8px",
+                background: modalType === "login" ? "#667eea" : "transparent",
+                color: modalType === "login" ? "white" : "#666",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+            >
+              Login
+            </button>
+            <button
+              onClick={() => setModalType("register")}
+              style={{
+                flex: 1,
+                padding: "12px",
+                border: "none",
+                borderRadius: "8px",
+                background:
+                  modalType === "register" ? "#667eea" : "transparent",
+                color: modalType === "register" ? "white" : "#666",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+            >
+              Register
+            </button>
+          </div>
+
+          {modalType === "login" ? (
+            <form onSubmit={handleLogin}>
+              <div style={{ marginBottom: "20px" }}>
+                <select
+                  value={loginForm.type}
+                  onChange={(e) =>
+                    setLoginForm({ ...loginForm, type: e.target.value })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "15px",
+                    border: "2px solid #e1e5e9",
+                    borderRadius: "10px",
+                    fontSize: "16px",
+                    marginBottom: "15px",
+                    outline: "none",
+                    transition: "border-color 0.3s ease",
+                  }}
+                >
+                  <option value="student">Student</option>
+                  <option value="teacher">Teacher</option>
+                </select>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={loginForm.email}
+                  onChange={(e) =>
+                    setLoginForm({ ...loginForm, email: e.target.value })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "15px",
+                    border: "2px solid #e1e5e9",
+                    borderRadius: "10px",
+                    fontSize: "16px",
+                    marginBottom: "15px",
+                    outline: "none",
+                    transition: "border-color 0.3s ease",
+                  }}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={loginForm.password}
+                  onChange={(e) =>
+                    setLoginForm({ ...loginForm, password: e.target.value })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "15px",
+                    border: "2px solid #e1e5e9",
+                    borderRadius: "10px",
+                    fontSize: "16px",
+                    outline: "none",
+                    transition: "border-color 0.3s ease",
+                  }}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                style={{
+                  width: "100%",
+                  padding: "15px",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "transform 0.2s ease",
+                }}
+                onMouseOver={(e) =>
+                  (e.target.style.transform = "translateY(-2px)")
+                }
+                onMouseOut={(e) => (e.target.style.transform = "translateY(0)")}
+              >
+                Login
+              </button>
+              <button
+  type="button"
+  onClick={handleGuestLogin}
+  style={{
+    width: "100%",
+    padding: "12px",
+    marginTop: "10px",
+    background: "#f0f0f0",
+    color: "#333",
+    border: "2px solid #ccc",
+    borderRadius: "10px",
+    fontSize: "16px",
+    fontWeight: "600",
+    cursor: "pointer",
+  }}
+>
+  🚀 Continue as Guest
+</button>
+
+              <div
+                style={{
+                  textAlign: "center",
+                  marginTop: "15px",
+                  fontSize: "14px",
+                  color: "#666",
+                }}
+              >
+                Demo: student@school.edu / password
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleRegister}>
+              <div style={{ marginBottom: "20px" }}>
+                <select
+                  value={registerForm.type}
+                  onChange={(e) =>
+                    setRegisterForm({ ...registerForm, type: e.target.value })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "15px",
+                    border: "2px solid #e1e5e9",
+                    borderRadius: "10px",
+                    fontSize: "16px",
+                    marginBottom: "15px",
+                    outline: "none",
+                  }}
+                >
+                  <option value="student">Student</option>
+                  <option value="teacher">Teacher</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={registerForm.name}
+                  onChange={(e) =>
+                    setRegisterForm({ ...registerForm, name: e.target.value })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "15px",
+                    border: "2px solid #e1e5e9",
+                    borderRadius: "10px",
+                    fontSize: "16px",
+                    marginBottom: "15px",
+                    outline: "none",
+                  }}
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={registerForm.email}
+                  onChange={(e) =>
+                    setRegisterForm({ ...registerForm, email: e.target.value })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "15px",
+                    border: "2px solid #e1e5e9",
+                    borderRadius: "10px",
+                    fontSize: "16px",
+                    marginBottom: "15px",
+                    outline: "none",
+                  }}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={registerForm.password}
+                  onChange={(e) =>
+                    setRegisterForm({
+                      ...registerForm,
+                      password: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "15px",
+                    border: "2px solid #e1e5e9",
+                    borderRadius: "10px",
+                    fontSize: "16px",
+                    outline: "none",
+                  }}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                style={{
+                  width: "100%",
+                  padding: "15px",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "transform 0.2s ease",
+                }}
+                onMouseOver={(e) =>
+                  (e.target.style.transform = "translateY(-2px)")
+                }
+                onMouseOut={(e) => (e.target.style.transform = "translateY(0)")}
+              >
+                Register
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#f8f9fa" }}>
+      {/* Header */}
+      <header
+        style={{
+          background: "white",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+          padding: "20px 0",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "0 20px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <h1
+              style={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                color: "#333",
+                margin: 0,
+              }}
+            >
+              📚 EduBook
+            </h1>
+            <span
+              style={{
+                marginLeft: "20px",
+                padding: "8px 16px",
+                background: userType === "student" ? "#e3f2fd" : "#f3e5f5",
+                color: userType === "student" ? "#1976d2" : "#7b1fa2",
+                borderRadius: "20px",
+                fontSize: "14px",
+                fontWeight: "600",
+              }}
+            >
+              {userType === "student" ? "🎓 Student" : "👨‍🏫 Teacher"}
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+            <span style={{ color: "#666" }}>Welcome, {currentUser.name}</span>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: "10px 20px",
+                background: "#ff4757",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontWeight: "600",
+              }}
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div
+        style={{ maxWidth: "1200px", margin: "0 auto", padding: "30px 20px" }}
+      >
+        {userType === "student" ? (
+          <div>
+            {/* Student Dashboard */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "30px",
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                  color: "#333",
+                  margin: 0,
+                }}
+              >
+                Student Dashboard
+              </h2>
+              <button
+                onClick={() => {
+                  setModalType("book");
+                  setShowModal(true);
+                }}
+                style={{
+                  padding: "12px 24px",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                📅 Book Appointment
+              </button>
+            </div>
+
+            {/* My Appointments */}
+            <div
+              style={{
+                background: "white",
+                borderRadius: "15px",
+                padding: "30px",
+                boxShadow: "0 5px 15px rgba(0,0,0,0.08)",
+                marginBottom: "30px",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#333",
+                  marginBottom: "20px",
+                }}
+              >
+                My Appointments
+              </h3>
+              {appointments.filter((apt) => apt.studentId === currentUser.id)
+                .length === 0 ? (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#666",
+                  }}
+                >
+                  <div style={{ fontSize: "48px", marginBottom: "15px" }}>
+                    📅
+                  </div>
+                  <p>No appointments booked yet</p>
+                </div>
+              ) : (
+                <div style={{ display: "grid", gap: "15px" }}>
+                  {appointments
+                    .filter((apt) => apt.studentId === currentUser.id)
+                    .map((appointment) => (
+                      <div
+                        key={appointment.id}
+                        style={{
+                          border: "2px solid #e1e5e9",
+                          borderRadius: "12px",
+                          padding: "20px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div>
+                          <h4
+                            style={{
+                              fontSize: "18px",
+                              fontWeight: "600",
+                              color: "#333",
+                              margin: "0 0 8px 0",
+                            }}
+                          >
+                            {appointment.teacherName}
+                          </h4>
+                          <p style={{ color: "#666", margin: "0 0 5px 0" }}>
+                            {appointment.subject}
+                          </p>
+                          <p style={{ color: "#666", margin: 0 }}>
+                            {formatDate(appointment.date)} at {appointment.time}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => cancelAppointment(appointment.id)}
+                          style={{
+                            padding: "8px 16px",
+                            background: "#ff4757",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontWeight: "600",
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            {/* Available Teachers */}
+            <div
+              style={{
+                background: "white",
+                borderRadius: "15px",
+                padding: "30px",
+                boxShadow: "0 5px 15px rgba(0,0,0,0.08)",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#333",
+                  marginBottom: "20px",
+                }}
+              >
+                Available Teachers
+              </h3>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                  gap: "20px",
+                }}
+              >
+                {teachers.map((teacher) => (
+                  <div
+                    key={teacher.id}
+                    style={{
+                      border: "2px solid #e1e5e9",
+                      borderRadius: "12px",
+                      padding: "20px",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        fontSize: "18px",
+                        fontWeight: "600",
+                        color: "#333",
+                        margin: "0 0 8px 0",
+                      }}
+                    >
+                      {teacher.name}
+                    </h4>
+                    <p style={{ color: "#666", margin: "0 0 5px 0" }}>
+                      {teacher.subject}
+                    </p>
+                    <p style={{ color: "#666", margin: "0 0 15px 0" }}>
+                      {teacher.email}
+                    </p>
+                    <div style={{ fontSize: "14px", color: "#666" }}>
+                      <strong>Available slots:</strong>
+                      {teacherAvailability[teacher.id] ? (
+                        <div style={{ marginTop: "8px" }}>
+                          {Object.entries(teacherAvailability[teacher.id]).map(
+                            ([date, times]) =>
+                              times.length > 0 && (
+                                <div key={date} style={{ marginBottom: "5px" }}>
+                                  <strong>{formatDate(date)}:</strong>{" "}
+                                  {times.join(", ")}
+                                </div>
+                              ),
+                          )}
+                        </div>
+                      ) : (
+                        <span style={{ color: "#ff4757" }}>
+                          {" "}
+                          No slots available
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div>
+            {/* Teacher Dashboard */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "30px",
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "bold",
+                  color: "#333",
+                  margin: 0,
+                }}
+              >
+                Teacher Dashboard
+              </h2>
+              <button
+                onClick={() => {
+                  setModalType("availability");
+                  setShowModal(true);
+                }}
+                style={{
+                  padding: "12px 24px",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                ⏰ Add Availability
+              </button>
+            </div>
+
+            {/* Upcoming Appointments */}
+            <div
+              style={{
+                background: "white",
+                borderRadius: "15px",
+                padding: "30px",
+                boxShadow: "0 5px 15px rgba(0,0,0,0.08)",
+                marginBottom: "30px",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#333",
+                  marginBottom: "20px",
+                }}
+              >
+                Upcoming Appointments
+              </h3>
+              {appointments.filter((apt) => apt.teacherId === currentUser.id)
+                .length === 0 ? (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#666",
+                  }}
+                >
+                  <div style={{ fontSize: "48px", marginBottom: "15px" }}>
+                    📅
+                  </div>
+                  <p>No appointments scheduled</p>
+                </div>
+              ) : (
+                <div style={{ display: "grid", gap: "15px" }}>
+                  {appointments
+                    .filter((apt) => apt.teacherId === currentUser.id)
+                    .map((appointment) => (
+                      <div
+                        key={appointment.id}
+                        style={{
+                          border: "2px solid #e1e5e9",
+                          borderRadius: "12px",
+                          padding: "20px",
+                        }}
+                      >
+                        <h4
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            color: "#333",
+                            margin: "0 0 8px 0",
+                          }}
+                        >
+                          {appointment.studentName}
+                        </h4>
+                        <p style={{ color: "#666", margin: "0 0 5px 0" }}>
+                          {formatDate(appointment.date)} at {appointment.time}
+                        </p>
+                        <span
+                          style={{
+                            padding: "4px 12px",
+                            background: "#e8f5e8",
+                            color: "#2e7d32",
+                            borderRadius: "20px",
+                            fontSize: "12px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {appointment.status}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            {/* My Availability */}
+            <div
+              style={{
+                background: "white",
+                borderRadius: "15px",
+                padding: "30px",
+                boxShadow: "0 5px 15px rgba(0,0,0,0.08)",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#333",
+                  marginBottom: "20px",
+                }}
+              >
+                My Availability
+              </h3>
+              {teacherAvailability[currentUser.id] ? (
+                <div style={{ display: "grid", gap: "15px" }}>
+                  {Object.entries(teacherAvailability[currentUser.id]).map(
+                    ([date, times]) => (
+                      <div
+                        key={date}
+                        style={{
+                          border: "2px solid #e1e5e9",
+                          borderRadius: "12px",
+                          padding: "20px",
+                        }}
+                      >
+                        <h4
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: "600",
+                            color: "#333",
+                            marginBottom: "15px",
+                          }}
+                        >
+                          {formatDate(date)}
+                        </h4>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "10px",
+                          }}
+                        >
+                          {times.map((time) => (
+                            <div
+                              key={time}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                padding: "8px 12px",
+                                background: "#f8f9fa",
+                                borderRadius: "8px",
+                              }}
+                            >
+                              <span>{time}</span>
+                              <button
+                                onClick={() => removeAvailability(date, time)}
+                                style={{
+                                  background: "#ff4757",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: "4px",
+                                  width: "20px",
+                                  height: "20px",
+                                  cursor: "pointer",
+                                  fontSize: "12px",
+                                }}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ),
+                  )}
+                </div>
+              ) : (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#666",
+                  }}
+                >
+                  <div style={{ fontSize: "48px", marginBottom: "15px" }}>
+                    ⏰
+                  </div>
+                  <p>No availability set yet</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: "20px",
+              padding: "30px",
+              maxWidth: "500px",
+              width: "100%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                  color: "#333",
+                  margin: 0,
+                }}
+              >
+                {modalType === "book"
+                  ? "📅 Book Appointment"
+                  : "⏰ Add Availability"}
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "24px",
+                  cursor: "pointer",
+                  color: "#666",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {modalType === "book" ? (
+              <div>
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontWeight: "600",
+                      color: "#333",
+                    }}
+                  >
+                    Select Teacher
+                  </label>
+                  <select
+                    value={selectedTeacher?.id || ""}
+                    onChange={(e) => {
+                      const teacher = teachers.find(
+                        (t) => t.id === parseInt(e.target.value),
+                      );
+                      setSelectedTeacher(teacher);
+                      setSelectedDate("");
+                      setSelectedTime("");
+                    }}
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      border: "2px solid #e1e5e9",
+                      borderRadius: "8px",
+                      fontSize: "16px",
+                      outline: "none",
+                    }}
+                  >
+                    <option value="">Choose a teacher</option>
+                    {teachers.map((teacher) => (
+                      <option key={teacher.id} value={teacher.id}>
+                        {teacher.name} - {teacher.subject}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {selectedTeacher && (
+                  <div style={{ marginBottom: "20px" }}>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontWeight: "600",
+                        color: "#333",
+                      }}
+                    >
+                      Select Date
+                    </label>
+                   <input
+  type="date"
+  value={selectedDate}
+  onChange={(e) => {
+  setSelectedDate(e.target.value.split("T")[0]);
+  setSelectedTime("");
+}}
+
+  min={new Date().toISOString().split("T")[0]} // restrict to today or later
+  style={{
+    width: "100%",
+    padding: "12px",
+    border: "2px solid #e1e5e9",
+    borderRadius: "8px",
+    fontSize: "16px",
+    outline: "none",
+  }}
+/>
+
+                  </div>
+                )}
+
+                {selectedTeacher && selectedDate && (
+  <div style={{ marginBottom: "20px" }}>
+    <label
+      style={{
+        display: "block",
+        marginBottom: "8px",
+        fontWeight: "600",
+        color: "#333",
+      }}
+    >
+      Select Time
+    </label>
+
+    {teacherAvailability[selectedTeacher?.id]?.[selectedDate]?.length > 0 ? (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
+          gap: "10px",
+        }}
+      >
+        {teacherAvailability[selectedTeacher.id][selectedDate].map((time) => (
+          <button
+            key={time}
+            onClick={() => setSelectedTime(time)}
+            style={{
+              padding: "12px",
+              border:
+                selectedTime === time
+                  ? "2px solid #667eea"
+                  : "2px solid #e1e5e9",
+              borderRadius: "8px",
+              background: selectedTime === time ? "#f0f4ff" : "white",
+              cursor: "pointer",
+              fontWeight: "600",
+              color: selectedTime === time ? "#667eea" : "#333",
+            }}
+          >
+            {time}
+          </button>
+        ))}
+      </div>
+    ) : (
+      <div
+        style={{
+          padding: "20px",
+          textAlign: "center",
+          color: "#ff4757",
+          background: "#fff4f4",
+          borderRadius: "8px",
+          fontWeight: "600",
+        }}
+      >
+        🚫 No slots available for this date
+      </div>
+    )}
+  </div>
+)}
+
+
+                <div
+                  style={{ display: "flex", gap: "15px", marginTop: "30px" }}
+                >
+                  <button
+                    onClick={() => setShowModal(false)}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      background: "#f8f9fa",
+                      color: "#666",
+                      border: "2px solid #e1e5e9",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={bookAppointment}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Book Appointment
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+               <input
+  type="date"
+  value={selectedDate}
+  onChange={(e) => {
+    const dateOnly = e.target.value.split("T")[0];
+    setSelectedDate(dateOnly);
+    setSelectedTime("");
+  }}
+  min={new Date().toISOString().split("T")[0]}
+  style={{
+    width: "100%",
+    padding: "12px",
+    border: "2px solid #e1e5e9",
+    borderRadius: "8px",
+    fontSize: "16px",
+    outline: "none",
+  }}
+/>
+
+
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontWeight: "600",
+                      color: "#333",
+                    }}
+                  >
+                    Select Time
+                  </label>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fit, minmax(100px, 1fr))",
+                      gap: "10px",
+                    }}
+                  >
+                    {getTimeSlots().map((time) => (
+                      <button
+                        key={time}
+                        onClick={() => setSelectedTime(time)}
+                        style={{
+                          padding: "12px",
+                          border:
+                            selectedTime === time
+                              ? "2px solid #667eea"
+                              : "2px solid #e1e5e9",
+                          borderRadius: "8px",
+                          background:
+                            selectedTime === time ? "#f0f4ff" : "white",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                          color: selectedTime === time ? "#667eea" : "#333",
+                        }}
+                      >
+                        {time}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  style={{ display: "flex", gap: "15px", marginTop: "30px" }}
+                >
+                  <button
+                    onClick={() => setShowModal(false)}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      background: "#f8f9fa",
+                      color: "#666",
+                      border: "2px solid #e1e5e9",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={addAvailability}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Add Availability
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+      // ⬇️ Paste the full MainComponent() code here
+      // and at the bottom mount it like below:
+      // ReactDOM.createRoot(document.getElementById('root')).render(<MainComponent />);
+      ReactDOM.createRoot(document.getElementById('root')).render(<MainComponent />);
+
+    </script>
+  </body>
+</html>
